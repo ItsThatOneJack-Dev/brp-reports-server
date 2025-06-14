@@ -1109,7 +1109,7 @@ app.get('*', (req, res) => {
 // Start server
 app.listen(PORT, () => {
     console.log(`🚀 Report server running on port ${PORT}`);
-    console.log(`📊 Reports available at: ${process.env.RENDER_EXTERNAL_URL || "http://localhost:"+PORT+"/reports"});
+    console.log(`📊 Reports available at: ${process.env.RENDER_EXTERNAL_URL || "http://localhost:"+PORT+"/reports"}`);
     console.log(`🔧 GitHub integration: ${CONFIG.GITHUB_ENABLED ? 'ENABLED' : 'DISABLED'}`);
 });
 
