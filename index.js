@@ -969,12 +969,6 @@ app.get('/reports', (req, res) => {
                     });
                     
                     if (response.ok) {
-                        // Show success message
-                        const button = event.target;
-                        const originalText = button.innerHTML;
-                        button.innerHTML = action === 'approved' ? 'Approved!' : 'Denied!';
-                        button.disabled = true;
-                        
                         // Reload reports after a brief delay
                         setTimeout(() => {
                             loadReports();
