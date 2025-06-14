@@ -1088,13 +1088,13 @@ app.post('/api/action', async (req, res) => {
     if (action === 'approved') {
         let Target = actionedReports.slice(-1)[0].target;
         let Reporter = actionedReports.slice(-1)[0].reporter;
-        let BodyText = actionedReports.slice(-1)[0].body;
+        let BodyText = actionedReports.slice(-1)[0].context;
         FireWebhook(`**Approved**\n\n**Body Text: **"\`${BodyText}\`"\n\n**\`Target  : \`**[${Target}](<https://rugplay.com/user/${Target}>)\n**\`Reporter: \`**[${Reporter}](<https://rugplay.com/user/${Reporter}>)`,CONFIG.ACTIONS_WEBHOOK);
         await addToGitHubBanList(report);
     } else {
         let Target = actionedReports.slice(-1)[0].target;
         let Reporter = actionedReports.slice(-1)[0].reporter;
-        let BodyText = actionedReports.slice(-1)[0].body;
+        let BodyText = actionedReports.slice(-1)[0].context;
         FireWebhook(`**Approved**\n\n**Body Text: **"\`${BodyText}\`"\n\n**\`Target  : \`**[${Target}](<https://rugplay.com/user/${Target}>)\n**\`Reporter: \`**[${Reporter}](<https://rugplay.com/user/${Reporter}>)`,CONFIG.ACTIONS_WEBHOOK);
     }
     
@@ -1109,7 +1109,7 @@ app.get('*', (req, res) => {
 // Start server
 app.listen(PORT, () => {
     console.log(`🚀 Report server running on port ${PORT}`);
-    console.log(`📊 Reports available at: http://localhost:${PORT}/reports`);
+    console.log(`📊 Reports available at: ${process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`}/reports`});
     console.log(`🔧 GitHub integration: ${CONFIG.GITHUB_ENABLED ? 'ENABLED' : 'DISABLED'}`);
 });
 
