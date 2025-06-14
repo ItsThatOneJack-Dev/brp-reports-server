@@ -38,7 +38,7 @@ const CONFIG = {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Enable CORS for all routes
+// CORS
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -51,11 +51,9 @@ app.use((req, res, next) => {
     }
 });
 
-// In-memory storage (replace with database in production)
 let reports = [];
 let actionedReports = [];
 
-// GitHub client setup
 let octokit = null;
 if (CONFIG.GITHUB_ENABLED && CONFIG.GITHUB_TOKEN) {
     octokit = new Octokit({
@@ -63,14 +61,12 @@ if (CONFIG.GITHUB_ENABLED && CONFIG.GITHUB_TOKEN) {
     });
 }
 
-// Rate limiter for reports
+// Rate limiter
 const reportLimiter = rateLimit(CONFIG.REPORT_RATE_LIMIT);
 
-// Utility functions
 function generateReportId() {
     return crypto.randomBytes(8).toString('hex');
 }
-
 
 async function FireWebhook(Content,URL) {
     try {
@@ -100,7 +96,6 @@ async function FireWebhook(Content,URL) {
         console.error('[WEBHOOK] Error message:', error.message);
         console.error('[WEBHOOK] Error stack:', error.stack);
         
-        // Check for common error types
         if (error.code === 'ENOTFOUND') {
             console.error('[WEBHOOK] Network error - DNS resolution failed');
         } else if (error.code === 'ECONNREFUSED') {
@@ -118,7 +113,6 @@ async function addToGitHubBanList(reportData) {
     }
     
     try {
-        // Get current file
         let currentFile;
         let currentSha;
         let bannedUsers = [];
@@ -134,7 +128,6 @@ async function addToGitHubBanList(reportData) {
             currentSha = response.data.sha;
             bannedUsers = JSON.parse(currentFile).banned_users || [];
         } catch (error) {
-            // File doesn't exist, create new structure
             console.log('File not found, creating...');
         }
         
@@ -155,7 +148,6 @@ async function addToGitHubBanList(reportData) {
             last_updated: new Date().toISOString()
         }, null, 2);
         
-        // Update file
         await octokit.rest.repos.createOrUpdateFileContents({
             owner: CONFIG.GITHUB_OWNER,
             repo: CONFIG.GITHUB_REPO,
@@ -175,7 +167,6 @@ async function addToGitHubBanList(reportData) {
 app.post('/report', reportLimiter, (req, res) => {
     const { target, reporter, context, reason } = req.body;
     
-    // Validate input
     if (target === undefined || target === null || reporter === undefined || reporter === null || !context) {
         console.log('❌ [REPORT] Validation failed - missing fields.');
         return res.status(400).json({ 
@@ -183,7 +174,6 @@ app.post('/report', reportLimiter, (req, res) => {
         });
     }
     
-    // Convert to numbers and validate
     const targetNum = typeof target === 'number' ? target : Number(target);
     const reporterNum = typeof reporter === 'number' ? reporter : Number(reporter);
     
@@ -1099,6 +1089,10 @@ app.post('/api/action', async (req, res) => {
     }
     
     res.json({ success: true, message: `Report ${action} successfull!` });
+});
+
+app.all('/discord', (req, res) => {
+    res.status(301).redirect('https://discord.gg/eQ5G2z2Rjt');
 });
 
 // Redirect all other routes to /reports
